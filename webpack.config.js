@@ -1,9 +1,13 @@
 
 var path = require('path')
 var webpack = require('webpack')
+var nodeExternals = require('webpack-node-externals')
+
+var VueLoaderPlugin = require('vue-loader/lib/plugin')
+
 
 module.exports = {
-  entry: './src/index.ts',
+    entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -13,17 +17,8 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-            // the "scss" and "sass" values for the lang attribute to the right configs here.
-            // other preprocessors should work out of the box, no loader config like this necessary.
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
-          }
-          // other vue-loader options go here
-        }
+        loader: 'vue-loader'
+                  // other vue-loader options go here
       },
       {
         test: /\.tsx?$/,
@@ -39,7 +34,14 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
-      }
+      },
+        {
+            test: /\.css/,
+            use: [
+                'vue-style-loader',
+                'css-loader'
+            ]
+        }
     ]
   },
   resolve: {
@@ -55,7 +57,10 @@ module.exports = {
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map'
+    devtool: '#eval-source-map',
+    plugins: [
+        new VueLoaderPlugin()
+    ]
 }
 
 if (process.env.NODE_ENV === 'production') {

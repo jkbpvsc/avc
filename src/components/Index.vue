@@ -4,8 +4,9 @@
             <router-link class="menu-item" to="/1">One</router-link>
             <router-link class="menu-item" to="/test">p5</router-link>
             <router-link class="menu-item" to="/pleasures">Pleasures</router-link>
+            <router-link class="menu-item" to="/nike">Nike</router-link>
         </div>
-        <div class="title">Audio to video converter</div>
+        <div class="title">Audio video converter</div>
     </div>
 </template>
 
@@ -23,12 +24,12 @@
         user-select: none;
         display: inline-block;
         float: right;
-        max-width: 10em;
+        max-width: 8em;
     }
 
     .menu {
         border: 1px silver solid;
-        margin: 1em;
+        margin: 4em;
         display: inline-block;
         width: 160px;
     }
@@ -37,6 +38,7 @@
         margin: 1em;
         color: whitesmoke;
         text-decoration: none;
+        display: block; 
     }
 </style>
 

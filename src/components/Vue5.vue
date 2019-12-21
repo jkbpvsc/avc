@@ -1,5 +1,5 @@
 <template>
-    <div ref="p5_container"> P5 </div>
+    <div class="p5-container" ref="p5_container"> </div>
 </template>
 
 <script lang="ts">
@@ -21,4 +21,12 @@
         }
     }
 </script>
+
+<style scoped>
+  .p5-container {
+  margin: auto;
+    width: 50%;
+
+  }
+</style>
 

@@ -1,46 +1,46 @@
 import Vue from 'vue';
-import { AddressBook, ModConstructor, Modulator } from '../interfaces';
+import {AddressBook, ModConstructor, Modulator, ModulatorOptions} from '../interfaces';
 import { Controller } from './controller';
 import { evaluate } from './executionQueue';
+import {getModulator} from './modulators';
 
 export  class ModulatorBoard {
-    public valueArray: number[];
     public controllers: { [name: string]: Controller };
-    public addressBook: AddressBook;
     private vue: Vue;
 
     constructor(vue: Vue) {
         this.vue = vue;
-        this.valueArray = [];
-        this.addressBook = {};
         this.controllers = {};
     }
 
     public register(
-        name: string,
-        modulatorConstructor: ModConstructor,
+        options: ModulatorOptions,
     ) {
-        if (!this.addressBook[name]) {
-            this.addressBook[name] = {};
+        if (!this.controllers[options.key]) {
+            this.controllers[options.key] = getModulator(options.type)(options, this.vue);
         }
-
-        this.controllers[name] = modulatorConstructor(name, this.valueArray, this.addressBook);
+        this.vue.$store.commit('setOptions', options);
     }
 
     public get(name: string): number {
-        return this.valueArray[this.addressBook[name].out];
+        const index = this.vue.$store.getters.addressBook[name].out;
+        return this.vue.$store.getters.valueArray[index] || 0;
+    }
+
+    public updateAddress(
+        name: string,
+        key: string,
+        address: number,
+    ) {
+
+        this.vue.$store.commit('updateAddress', { name, key, address });
+        const options = this.vue.$store.getters.options[name];
+        this.controllers[name] = getModulator(options.type)(options, this.vue);
     }
 
     public evaluate() {
+        this.vue.$store.commit('incrementTimer');
         const controllers: Controller[] = Object.keys(this.controllers).map((name: string) => this.controllers[name]);
-        console.log('Evaluating controllers');
         evaluate(controllers);
-        console.log(this.addressBook);
-        console.log(this.valueArray);
-    }
-
-    private draw() {
-        const valContainer = document.getElementById('mod-values');
-        const addressContainer = document.getElementById('mod-address');
     }
 }

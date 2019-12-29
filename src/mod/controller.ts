@@ -1,51 +1,46 @@
-import { AddressBook, Getter, Modulator, Setter } from '../interfaces';
+import Vue from 'vue';
+import {AddressBook, Getter, Modulator, ModulatorOptions, Setter} from '../interfaces';
 
 export class Controller {
-    public inputs: number[] = [];
-    public outputs: number[] = [];
-    public readonly name: string;
-    private readonly valueTable: number[];
+    public readonly options: ModulatorOptions;
+    private readonly vue: Vue;
     // @ts-ignore
     private modulator: Modulator;
 
     constructor(
-        name: string,
-        valueTable: number[],
+        options: ModulatorOptions,
+        vue: Vue,
     ) {
-        this.name = name;
-        this.valueTable = valueTable;
+        this.options = options;
+        this.vue = vue;
     }
 
-    public getter(index: number): Getter {
-        this.inputs.push(index);
-        console.log(`Controller ${this.name} getter created for address ${index}`);
+    public getter(key: string): Getter {
+        this.vue.$store.commit('publishAddress', { options: this.options , key });
+        const index: number = this.vue.$store.getters.addressBook[this.options.key][key];
+        // console.log(`Controller ${this.name} getter ${key} created for address ${index}`);
 
-        return () => index !== undefined ? this.valueTable[index] : 0;
+        return () => index !== undefined ? this.vue.$store.getters.valueArray[index] : 0;
     }
 
-    public setter(index: number): Setter {
-        this.outputs.push(index);
-        console.log(`Controller ${this.name} setter created for address ${index}`);
-
-        return (value: number) => index !== undefined && (this.valueTable[index] = value);
-    }
-
-    /*
-     public dynamicGetter(addressBook: AddressBook, name: string, key: string): Setter {
+    public setter(key: string): Setter {
+        this.vue.$store.commit('publishAddress', { options: this.options, key });
+        const index: number = this.vue.$store.getters.addressBook[this.options.key][key];
+        console.log(`Controller ${this.options.name} setter ${key} created for address ${index}`);
 
         return (value: number) => {
-            const valueTableIndex: number = addressBook[name][key];
-            this.outputs.push(valueTableIndex);
-        }
+            if (index !== undefined) {
+                this.vue.$store.commit('updateValue', { index, value });
+            }
+        };
     }
-    */
 
     public handler(f: Modulator) {
         this.modulator = f;
     }
 
     public run() {
-        console.log(`Controller ${this.name} modulator called`);
+        // console.log(`Controller ${this.name} modulator called`);
         this.modulator();
     }
 

@@ -1,7 +1,10 @@
 import * as p5 from 'p5';
+import Vue from 'vue';
 import {Controller} from './mod/controller';
 
 export type Sketch = (sketch: p5) => void;
+
+export type SketchVueWrapper = (vue: Vue) => Sketch;
 
 export type Getter = () => number;
 

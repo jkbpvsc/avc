@@ -1,10 +1,11 @@
 import {AddressBook} from '../interfaces';
 import {Controller} from './controller';
 
-export function evaluate (
+export function evaluate(
     controllers: Controller[],
 ): void {
-    controllers.forEach(
+    const sortedControllers = controllers;
+    sortedControllers.forEach(
         (controller: Controller) => controller.run(),
     );
 }

@@ -30,15 +30,18 @@ const modScale: ModConstructor = (
     return controller;
 };
 
-const modRandomScale: ModConstructor = (
+export const modRandomScale: ModConstructor = (
     name: string,
     valueTable: number[],
     addressBook: AddressBook,
 ) => {
+    console.log('Constructing controller modRandomScale')
+    console.log(addressBook)
     const controller: Controller = new Controller(name, valueTable);
 
     const val: Getter = controller.getter(addressBook[name].val);
     const factor: Getter = controller.getter(addressBook[name].factor);
+
     const out: Setter = controller.setter(addressBook[name].out);
 
     controller.handler(() => {

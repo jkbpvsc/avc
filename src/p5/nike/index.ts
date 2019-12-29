@@ -1,29 +1,48 @@
 import * as p5 from 'p5';
+import {Vue} from 'vue/types/vue';
+import {ModulatorBoard} from '../../mod/ModulatorBoard';
+import { modRandomScale } from '../../mod/mod';
 import { Vec2 } from '../P5Tools';
+
+import { chance } from '../../mod/utils';
 
 const HEIGHT = 480;
 const WIDTH = 640;
 let charset: MutatableChar[];
+let modulatorBoard: ModulatorBoard;
 
-export default function s(sketch: p5) {
-    sketch.preload = () => {
+export default function(vue: Vue) {
+    return  (sketch: p5) => {
+        sketch.preload = () => {
+            modulatorBoard = new ModulatorBoard(vue);
+        };
 
+        sketch.setup = () => {
+            sketch.createCanvas(WIDTH, HEIGHT);
+            sketch.frameRate(10)
+
+            charset = generateLineMutatableText(['a', 'A', 't', 'T', 'g', 'G', 'c', 'C', ' ', '.'], sketch);
+        };
+
+        sketch.draw = () => {
+
+            modulatorBoard.register('fill', modRandomScale);
+            modulatorBoard.addressBook.fill.val = 0;
+            modulatorBoard.addressBook.fill.factor = 0;
+            modulatorBoard.addressBook.fill.out = 1;
+            modulatorBoard.valueArray[0] = 100;
+
+            modulatorBoard.evaluate();
+
+            sketch.background(22, 22, 29);
+            sketch.strokeWeight(0);
+            sketch.fill(255);
+
+            console.log(modulatorBoard.get('fill'))
+
+            printMutatableCharText(sketch, charset, HEIGHT / 2 - 30);
+        };
     };
-
-    sketch.setup = () => {
-        sketch.createCanvas(WIDTH, HEIGHT);
-        sketch.frameRate(30)
-
-        charset = generateLineMutatableText(['a', 'A', 't', 'T', 'g', 'G', 'c', 'C', ' ', '.'], sketch);
-    }
-
-    sketch.draw = () => {
-        sketch.background(22, 22, 29);
-        sketch.strokeWeight(0);
-        sketch.fill(255)
-
-        printMutatableCharText(sketch, charset, HEIGHT / 2 - 30)
-    }
 }
 
 function getRandomElement<T>(array: T[]): T {
@@ -49,10 +68,6 @@ function generateLineMutatableText(
     return chars;
 }
 
-function chance(x: number): boolean {
-    return Math.random() < x;
-}
-
 function printMutatableCharText(
     s: p5,
     charset: MutatableChar[],
@@ -62,19 +77,20 @@ function printMutatableCharText(
     const SIZE = 15;
     const TEXT_SIZE = 23;
 
-
     for (let i = 0; i < charset.length; i++) {
         s.textStyle(charset[i].style as any)
         char(s, new Vec2(STARTX + i * SIZE, height), charset[i].toString(), TEXT_SIZE);
     }
 
 }
+
 class MutatableChar {
     private charset: string[];
     private char: string;
     public style: string;
     private s: p5;
-    static mutationChance: number = 0.005;
+    static mutationChance: number = 0.0005;
+
     constructor(charset: string[], s: p5) {
         this.charset = charset;
         this.char = getRandomElement(charset);
@@ -96,9 +112,8 @@ class MutatableChar {
     }
 
     private mutateStyle() {
-        if (chance(0.05)) {
+        if (chance(0.04)) {
             this.style = getRandomElement([this.s.NORMAL, this.s.ITALIC, this.s.BOLDITALIC, this.s.BOLD])
         }
     }
 }
-
